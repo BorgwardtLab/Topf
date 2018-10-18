@@ -181,5 +181,25 @@ class PersistenceTransformer:
 
 
 if __name__ == '__main__':
-    pt = PersistenceTransformer()
-    pt.fit_transform([(0,1),(1,7),(2,4),(3,5),(4,2),(5,8),(6,0)])
+
+    import sys
+
+    data = np.genfromtxt(sys.argv[1], dtype=float, delimiter=',', names=True) 
+    data = np.vstack((data['mass'], data['intensity'])).T
+
+    transformer = PersistenceTransformer(calculate_persistence_diagram=True)
+    transformed_data = transformer.fit_transform(data)
+
+    total_persistence = transformer.persistence_diagram.total_persistence()
+
+    #np.apply_along_axis(lambda x: transformed_data[:,1], 
+    #transformed_data[:, 1] = transformed_data[:, 1] / total_persistence
+    #data[transformed_data[:, 1] == 0, 1] = 0
+
+    #transformed_data[:, 1] = transformed_data[:, 1] / total_persistence
+    #transformed_data[:, 1] = transformed_data[:, 1] * data[:, 1]
+
+    np.savetxt('/tmp/test.csv', transformed_data, fmt='%f')
+
+
+    #pt.fit_transform([(0,1),(1,7),(2,4),(3,5),(4,2),(5,8),(6,0)])
