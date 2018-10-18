@@ -42,9 +42,21 @@ class PersistenceTransformer:
     corresponding persistence diagram are returned as well.
     '''
 
+    def __init__(self, calculate_persistence_diagram=True):
+        self._calculate_persistence_diagram = calculate_persistence_diagram
+
     def fit_transform(self, a):
         a = np.asarray(a)
         indices = np.argsort(a[:,1])[::-1]
+
+        # Optionally, the function can also return a proper persistence
+        # diagram, i.e. a set of tuples that describe the merges.
+        if self._calculate_persistence_diagram:
+            b = np.zeros_like(a)
+            b[:,0] = a[:,1]  # y
+            b[:,1] = a[:,1]  # y (this is correct; everything is paired with itself)
+        else:
+            b = None
 
         # Prepare Union--Find data structure; by default, every vertex
         # is initialized to be its own parent.
@@ -76,9 +88,17 @@ class PersistenceTransformer:
                     # will be merged into the right one.
                     if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
                         persistence[uf.find(left_index)] = a[uf.find(left_index), 1] - y
+
+                        if self._calculate_persistence_diagram:
+                            b[uf.find(left_index), 1] = y
+
                         uf.merge(left_index, right_index)
                     else:
                         persistence[uf.find(right_index)] = a[uf.find(right_index), 1] - y
+
+                        if self._calculate_persistence_diagram:
+                            b[uf.find(right_index), 1] = y
+
                         uf.merge(right_index, left_index)
 
                 # The point is a regular point, i.e. one neighbour
@@ -101,7 +121,11 @@ class PersistenceTransformer:
 
             persistence[global_maximum_index] = a[global_maximum_index, 1] - a[global_minimum_index, 1]
 
-        print(persistence)
+            if self._calculate_persistence_diagram:
+                b[global_maximum_index, 1] =a[global_minimum_index, 1]
+
+        return persistence
+
 
 if __name__ == '__main__':
     pt = PersistenceTransformer()
