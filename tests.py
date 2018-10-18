@@ -41,3 +41,10 @@ class DiagramBeketavey(unittest.TestCase):
         # reported diagram.
         for point, persistence in zip(transformer2.persistence_diagram, persistence_b):
             self.assertEqual(point[0] - point[1], persistence)
+
+        self.assertEqual(transformer2.persistence_diagram.total_persistence(), 15.0)
+
+        tp1 = transformer2.persistence_diagram.total_persistence()
+        tp2 = transformer2.persistence_diagram.total_persistence(1.0)
+
+        self.assertEqual(tp1, tp2)

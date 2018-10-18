@@ -51,6 +51,19 @@ class PersistenceDiagram(collections.abc.Sequence):
     def __getitem__(self, index):
         return self._pairs[index]
 
+    def total_persistence(self, p=1.0):
+        '''
+        Calculates the sum of all persistence values in the diagram,
+        weighted by the specified power.
+        '''
+
+        assert p > 0.0
+
+        persistence_values = self._pairs[:, 0] - self._pairs[:, 1]
+        persistence_values = np.power(persistence_values, p)
+
+        return np.power(np.sum(persistence_values), 1.0 / p)
+
 
 class PersistenceTransformer:
     '''
