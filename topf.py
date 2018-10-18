@@ -51,6 +51,9 @@ class PersistenceDiagram(collections.abc.Sequence):
     def __getitem__(self, index):
         return self._pairs[index]
 
+    def __str__(self):
+        return str(self._pairs)
+
     def total_persistence(self, p=1.0):
         '''
         Calculates the sum of all persistence values in the diagram,
