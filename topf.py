@@ -76,11 +76,11 @@ class PersistenceTransformer:
                     # The left neighbour is the younger neighbour, so it
                     # will be merged into the right one.
                     if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
+                        persistence[uf.find(left_index)] = a[uf.find(left_index), 1] - y
                         uf.merge(left_index, right_index)
-                        persistence[left_index] = y
                     else:
+                        persistence[uf.find(right_index)] = a[uf.find(right_index), 1] - y
                         uf.merge(right_index, left_index)
-                        persistence[right_index] = y
 
                 # The point is a regular point, i.e. one neighbour
                 # has a higher function value, the other one has a
@@ -105,11 +105,16 @@ class PersistenceTransformer:
                 else:
                     neighbour_index = left_index
 
-                print('[B] at ({},{})'.format(x, y))
+                # A pair is only created if the neighbour has a higher
+                # function value.
+                y_neighbour = a[neighbour_index, 1]
+                if y_neighbour > y:
+                    print('[B] at ({},{}): {}'.format(x, y, y_neighbour))
+
 
         print(persistence)
 
 
 if __name__ == '__main__':
     pt = PersistenceTransformer()
-    pt.fit_transform([(0,1),(1,7),(2,4),(3,5)])
+    pt.fit_transform([(0,1),(1,7),(2,4),(3,5),(4,2),(5,8)])
