@@ -44,6 +44,7 @@ class PersistenceTransformer:
 
     def __init__(self, calculate_persistence_diagram=True):
         self._calculate_persistence_diagram = calculate_persistence_diagram
+        sefl._persistence_diagram = None
 
     def fit_transform(self, a):
         a = np.asarray(a)
@@ -122,9 +123,20 @@ class PersistenceTransformer:
             persistence[global_maximum_index] = a[global_maximum_index, 1] - a[global_minimum_index, 1]
 
             if self._calculate_persistence_diagram:
-                b[global_maximum_index, 1] =a[global_minimum_index, 1]
+                b[global_maximum_index, 1] = a[global_minimum_index, 1]
 
+        self._persistence_diagram = b
         return persistence
+
+    @property
+    def persistence_diagram(self):
+        '''
+        :return: Returns the persistence diagram that was optionally
+        calculated by calling :func:`fit_transform`. The diagram, if
+        available, will be returned as a 2D ``numpy.array`.
+        '''
+
+        return self._persistence_diagram
 
 
 if __name__ == '__main__':
