@@ -42,7 +42,7 @@ class PersistenceTransformer:
     corresponding persistence diagram are returned as well.
     '''
 
-    def __init__(self, calculate_persistence_diagram=True):
+    def __init__(self, calculate_persistence_diagram=False):
         self._calculate_persistence_diagram = calculate_persistence_diagram
         self._persistence_diagram = None
 
