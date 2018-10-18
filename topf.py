@@ -71,7 +71,6 @@ class PersistenceTransformer:
                 # The point is a local minimum, so we have to merge the
                 # two neighbours.
                 if y_left >= y and y <= y_right:
-                    print('[-] at ({},{})'.format(x, y))
 
                     # The left neighbour is the younger neighbour, so it
                     # will be merged into the right one.
@@ -86,7 +85,6 @@ class PersistenceTransformer:
                 # has a higher function value, the other one has a
                 # lower function value.
                 elif not (y > y_left and y > y_right):
-                    print('[=] at ({},{})'.format(x, y))
 
                     # Always merge the lower neighbour into the current
                     # point. This merge does not give rise to a pair.
@@ -95,26 +93,16 @@ class PersistenceTransformer:
                     else:
                         uf.merge(right_index, left_index)
 
-                else:
-                    print('[+] at ({},{})'.format(x, y))
+        # Assign the persistence value to the global maximum of the
+        # function to ensure that all tuples have been paired.
+        if num_vertices > 0:
+            global_maximum_index = indices[0]
+            global_minimum_index = indices[-1]
 
-            # Boundary point: only one neighbour is defined
-            else:
-                if left_index < 0:
-                    neighbour_index = right_index
-                else:
-                    neighbour_index = left_index
-
-                # A pair is only created if the neighbour has a higher
-                # function value.
-                y_neighbour = a[neighbour_index, 1]
-                if y_neighbour > y:
-                    print('[B] at ({},{}): {}'.format(x, y, y_neighbour))
-
+            persistence[global_maximum_index] = a[global_maximum_index, 1] - a[global_minimum_index, 1]
 
         print(persistence)
 
-
 if __name__ == '__main__':
     pt = PersistenceTransformer()
-    pt.fit_transform([(0,1),(1,7),(2,4),(3,5),(4,2),(5,8)])
+    pt.fit_transform([(0,1),(1,7),(2,4),(3,5),(4,2),(5,8),(6,0)])
