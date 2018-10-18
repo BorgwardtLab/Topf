@@ -146,7 +146,7 @@ class PersistenceTransformer:
 
                     # Always merge the lower neighbour into the current
                     # point. This merge does not give rise to a pair.
-                    if uf.find(left_index) < uf.find(right_index):
+                    if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
                         uf.merge(left_index, right_index)
                     else:
                         uf.merge(right_index, left_index)
