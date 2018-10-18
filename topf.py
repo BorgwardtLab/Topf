@@ -2,6 +2,7 @@
 
 
 import numpy as np
+import collections.abc
 
 
 class UnionFind:
@@ -33,6 +34,22 @@ class UnionFind:
         '''
         if u != v:
             self.parent[self.find(u)] = self.find(v)
+
+
+class PersistenceDiagram(collections.abc.Sequence):
+    '''
+    Simple class for storing the pairs of a persistence diagram. This is
+    nothing but a light-weight wrapper for additional convenience.
+    '''
+
+    def __init__(self, pairs):
+        self._pairs = pairs
+
+    def __len__(self):
+        return len(self._pairs)
+
+    def __getitem__(self, index):
+        return self._pairs[index]
 
 
 class PersistenceTransformer:
@@ -129,7 +146,11 @@ class PersistenceTransformer:
             if self._calculate_persistence_diagram:
                 b[global_maximum_index, 1] = a[global_minimum_index, 1]
 
-        self._persistence_diagram = b
+        # Only create a persistence diagram if we have some persistence
+        # tuples to store.
+        if b is not None:
+            self._persistence_diagram = PersistenceDiagram(b)
+
         return persistence
 
     @property
