@@ -27,3 +27,12 @@ class DiagramBeketavey(unittest.TestCase):
         self.assertTrue(len(persistence_a) == len(persistence_b))
         self.assertFalse(np.all(persistence_a == persistence_b))
         self.assertTrue(sorted(persistence_a) == sorted(persistence_b))
+
+        transformer1 = PersistenceTransformer(calculate_persistence_diagram=False)
+        transformer2 = PersistenceTransformer(calculate_persistence_diagram=True)
+
+        transformer1.fit_transform(a)
+        transformer2.fit_transform(b)
+
+        self.assertIsNone(transformer1.persistence_diagram)
+        self.assertIsNotNone(transformer2.persistence_diagram)
