@@ -167,7 +167,7 @@ class PersistenceTransformer:
         if b is not None:
             self._persistence_diagram = PersistenceDiagram(b)
 
-        return persistence
+        return np.vstack((a[:,0], persistence)).T
 
     @property
     def persistence_diagram(self):
