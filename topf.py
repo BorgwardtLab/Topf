@@ -44,10 +44,14 @@ class PersistenceTransformer:
 
     def __init__(self, calculate_persistence_diagram=True):
         self._calculate_persistence_diagram = calculate_persistence_diagram
-        sefl._persistence_diagram = None
+        self._persistence_diagram = None
 
     def fit_transform(self, a):
         a = np.asarray(a)
+
+        if len(a.shape) != 2 or a.shape[1] != 2:
+            raise RuntimeError('Unexpected array format')
+
         indices = np.argsort(a[:,1])[::-1]
 
         # Optionally, the function can also return a proper persistence
