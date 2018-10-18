@@ -130,14 +130,16 @@ class PersistenceTransformer:
                         if self._calculate_persistence_diagram:
                             b[uf.find(left_index), 1] = y
 
-                        uf.merge(left_index, right_index)
+                        uf.merge(left_index, index)
+                        uf.merge(index, right_index)
                     else:
                         persistence[uf.find(right_index)] = a[uf.find(right_index), 1] - y
 
                         if self._calculate_persistence_diagram:
                             b[uf.find(right_index), 1] = y
 
-                        uf.merge(right_index, left_index)
+                        uf.merge(right_index, index)
+                        uf.merge(index, left_index)
 
                 # The point is a regular point, i.e. one neighbour
                 # has a higher function value, the other one has a
@@ -147,9 +149,9 @@ class PersistenceTransformer:
                     # Always merge the lower neighbour into the current
                     # point. This merge does not give rise to a pair.
                     if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
-                        uf.merge(left_index, right_index)
+                        uf.merge(index, right_index)
                     else:
-                        uf.merge(right_index, left_index)
+                        uf.merge(index, left_index)
 
         # Assign the persistence value to the global maximum of the
         # function to ensure that all tuples have been paired.
