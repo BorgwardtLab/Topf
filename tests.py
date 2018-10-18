@@ -36,3 +36,8 @@ class DiagramBeketavey(unittest.TestCase):
 
         self.assertIsNone(transformer1.persistence_diagram)
         self.assertIsNotNone(transformer2.persistence_diagram)
+
+        # Checks that the persistence calculation is in line with the
+        # reported diagram.
+        for point, persistence in zip(transformer2.persistence_diagram, persistence_b):
+            self.assertEqual(point[0] - point[1], persistence)
