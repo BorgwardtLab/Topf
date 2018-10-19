@@ -146,8 +146,10 @@ class PersistenceTransformer:
                 # lower function value.
                 elif not (y > y_left and y > y_right):
 
-                    # Always merge the lower neighbour into the current
-                    # point. This merge does not give rise to a pair.
+                    # Always merge the higher neighbour into the current
+                    # point. This merge does not give rise to a pair. It
+                    # is merely a way to ensure that the disjoint set is
+                    # merged correctly.
                     if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
                         uf.merge(index, right_index)
                     else:

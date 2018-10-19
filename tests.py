@@ -48,3 +48,21 @@ class DiagramBeketavey(unittest.TestCase):
         tp2 = transformer2.persistence_diagram.total_persistence(1.0)
 
         self.assertEqual(tp1, tp2)
+
+
+class DiagramRegularPoints(unittest.TestCase):
+    '''
+    Checks that the addition of regular points to a series does not
+    create any new points in the persistence diagram.
+    '''
+
+    def test(self):
+        a = [(0, 3), (1, 1), (2, 6), (3, 5), (4, 8), (5, 2), (6, 7), (7, 4)]
+        b = [(0.5, 1.5), (1.5, 4.5), (2.5, 5.5), (3.5, 6.5), (5.5, 3.5), (6.5, 5.75)]
+        x = sorted(a + b, key=lambda x: x[0])
+
+        transformer = PersistenceTransformer(calculate_persistence_diagram=True)
+        transformer.fit_transform(x)
+        diagram = transformer.persistence_diagram
+
+        self.assertEqual(diagram.total_persistence(), 15.0)
