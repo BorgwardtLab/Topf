@@ -77,11 +77,10 @@ class DiagramPlateauPoints(unittest.TestCase):
     def test(self):
         a = [(0, 3), (1, 1), (2, 6), (3, 5), (4, 8), (5, 2), (6, 7), (7, 4)]
         b = [(1.5, 1), (2.5, 6), (3.5, 5)]
-        c = [(0, 3), (1, 1), (2, 8), (3, 2), (4, 7), (5, 5), (6, 6), (7, 4)]
-        d = [(4.5, 5.5), (6.5, 4)]
+        c = [(0, 0), (1, 0), (2, 1), (3, 0), (4, 1), (5, 0), (6, 0), (7, 1)]
 
         x = sorted(a + b, key=lambda x: x[0])
-        y = sorted(c + d, key=lambda x: x[0])
+        y = c
 
         transformer = PersistenceTransformer(calculate_persistence_diagram=True)
 
@@ -92,4 +91,4 @@ class DiagramPlateauPoints(unittest.TestCase):
         diagram2 = transformer.persistence_diagram
 
         self.assertEqual(diagram1.total_persistence(), 15.0)
-        self.assertEqual(diagram2.total_persistence(), 15.0)
+        self.assertEqual(diagram2.total_persistence(), 3.0)
