@@ -1,4 +1,4 @@
-![](topf.svg)
+![](topf.svg | width=128)
 
 # Topf &mdash; Topological peak filtering
 
