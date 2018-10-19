@@ -85,7 +85,10 @@ class PersistenceTransformer:
         if len(a.shape) != 2 or a.shape[1] != 2:
             raise RuntimeError('Unexpected array format')
 
-        indices = np.argsort(a[:,1])[::-1]
+        # This way of sorting ensures that points with the same
+        # y value will be sorted according to their x value. It
+        # ensures that left-most points are detected first.
+        indices = np.argsort(-a[:,1], kind='stable')
 
         # Optionally, the function can also return a proper persistence
         # diagram, i.e. a set of tuples that describe the merges.
