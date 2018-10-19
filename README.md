@@ -1,4 +1,7 @@
+
 ![](topf.svg | width=128)
+
+ <img src="topf.svg" width="100%" height="128" />
 
 # Topf &mdash; Topological peak filtering
 
