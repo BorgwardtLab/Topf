@@ -25,8 +25,8 @@ class DiagramBeketavey(unittest.TestCase):
         persistence_b = PersistenceTransformer().fit_transform(b)
 
         self.assertTrue(len(persistence_a) == len(persistence_b))
-        self.assertFalse(np.all(persistence_a == persistence_b))
-        self.assertTrue(sorted(persistence_a) == sorted(persistence_b))
+        self.assertFalse(np.all(persistence_a[:, 1] == persistence_b[:, 1]))
+        self.assertTrue(np.all(np.sort(persistence_a[:, 1]) == np.sort(persistence_b[:, 1])))
 
         transformer1 = PersistenceTransformer(calculate_persistence_diagram=False)
         transformer2 = PersistenceTransformer(calculate_persistence_diagram=True)
@@ -39,8 +39,8 @@ class DiagramBeketavey(unittest.TestCase):
 
         # Checks that the persistence calculation is in line with the
         # reported diagram.
-        for point, persistence in zip(transformer2.persistence_diagram, persistence_b):
-            self.assertEqual(point[0] - point[1], persistence)
+        for point, transformed_point in zip(transformer2.persistence_diagram, persistence_b):
+            self.assertEqual(point[0] - point[1], transformed_point[1])
 
         self.assertEqual(transformer2.persistence_diagram.total_persistence(), 15.0)
 
