@@ -66,3 +66,30 @@ class DiagramRegularPoints(unittest.TestCase):
         diagram = transformer.persistence_diagram
 
         self.assertEqual(diagram.total_persistence(), 15.0)
+
+
+class DiagramPlateauPoints(unittest.TestCase):
+    '''
+    Checks that the existence of points at equal levels as their
+    neighbours does not change the points in the diagram.
+    '''
+
+    def test(self):
+        a = [(0, 3), (1, 1), (2, 6), (3, 5), (4, 8), (5, 2), (6, 7), (7, 4)]
+        b = [(1.5, 1), (2.5, 6), (3.5, 5)]
+        c = [(0, 3), (1, 1), (2, 8), (3, 2), (4, 7), (5, 5), (6, 6), (7, 4)]
+        d = [(4.5, 5.5), (6.5, 4)]
+
+        x = sorted(a + b, key=lambda x: x[0])
+        y = sorted(c + d, key=lambda x: x[0])
+
+        transformer = PersistenceTransformer(calculate_persistence_diagram=True)
+
+        transformer.fit_transform(x)
+        diagram1 = transformer.persistence_diagram
+
+        transformer.fit_transform(y)
+        diagram2 = transformer.persistence_diagram
+
+        self.assertEqual(diagram1.total_persistence(), 15.0)
+        self.assertEqual(diagram2.total_persistence(), 15.0)
