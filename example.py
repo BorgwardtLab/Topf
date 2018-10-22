@@ -12,7 +12,7 @@ import seaborn as sns
 
 
 if __name__ == '__main__':
-    data = np.genfromtxt('data.txt')             # load data
+    data = np.genfromtxt('example.txt')          # load data
     transformer = topf.PersistenceTransformer()  # prepare transformer
     peaks = transformer.fit_transform(data)      # transform data into peaks
 
