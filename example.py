@@ -37,4 +37,5 @@ if __name__ == '__main__':
         y=filtered_data[:, 1],
     )
 
+    plt.tight_layout()
     plt.show()
