@@ -94,7 +94,7 @@ class PersistenceTransformer:
     '''
     Transforms a function that is represented as an input array of (x,y)
     pairs into (x, persistence(x)) pairs. Optionally, all tuples of the
-    corresponding persistence diagram are returned as well.
+    corresponding persistence diagram are calculated as well.
     '''
 
     def __init__(self, calculate_persistence_diagram=False):
