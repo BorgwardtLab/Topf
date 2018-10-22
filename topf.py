@@ -150,7 +150,8 @@ class PersistenceTransformer:
                     # The left neighbour is the younger neighbour, so it
                     # will be merged into the right one.
                     if a[uf.find(left_index), 1] < a[uf.find(right_index), 1]:
-                        persistence[uf.find(left_index)] = a[uf.find(left_index), 1] - y
+                        persistence[uf.find(left_index)] \
+                            = a[uf.find(left_index), 1] - y
 
                         if self._calculate_persistence_diagram:
                             b[uf.find(left_index), 1] = y
@@ -158,7 +159,8 @@ class PersistenceTransformer:
                         uf.merge(left_index, index)
                         uf.merge(index, right_index)
                     else:
-                        persistence[uf.find(right_index)] = a[uf.find(right_index), 1] - y
+                        persistence[uf.find(right_index)] \
+                            = a[uf.find(right_index), 1] - y
 
                         if self._calculate_persistence_diagram:
                             b[uf.find(right_index), 1] = y
@@ -185,7 +187,8 @@ class PersistenceTransformer:
             global_maximum_index = indices[0]
             global_minimum_index = indices[-1]
 
-            persistence[global_maximum_index] = a[global_maximum_index, 1] - a[global_minimum_index, 1]
+            persistence[global_maximum_index] \
+                = a[global_maximum_index, 1] - a[global_minimum_index, 1]
 
             if self._calculate_persistence_diagram:
                 b[global_maximum_index, 1] = a[global_minimum_index, 1]
