@@ -6,7 +6,7 @@ setup(
     version='0.1',
     packages=find_packages(),
     install_requires=['numpy'],
-    packages=['topf'],
+    py_modules=['topf'],
 
     package_data={
         # Not sure whether it is smart to distribute the logo along with
