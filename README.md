@@ -58,6 +58,9 @@ plt.show()
 
 This file is also available as [`example.py`](example.py) in this
 repository&nbsp;(with some minor modifications to simplify usage).
+It will result in the following output:
+
+![Example data with peak filtering](example.png)
 
 # Licence notice
 
