@@ -110,14 +110,14 @@ class PersistenceTransformer:
         # This way of sorting ensures that points with the same
         # y value will be sorted according to their x value. It
         # ensures that left-most points are detected first.
-        indices = np.argsort(-a[:,1], kind='stable')
+        indices = np.argsort(-a[:, 1], kind='stable')
 
         # Optionally, the function can also return a proper persistence
         # diagram, i.e. a set of tuples that describe the merges.
         if self._calculate_persistence_diagram:
             b = np.zeros_like(a)
-            b[:,0] = a[:,1]  # y
-            b[:,1] = a[:,1]  # y (this is correct; everything is paired with itself)
+            b[:, 0] = a[:, 1]  # y
+            b[:, 1] = a[:, 1]  # y (everything is paired with itself)
         else:
             b = None
 
@@ -195,7 +195,7 @@ class PersistenceTransformer:
         if b is not None:
             self._persistence_diagram = PersistenceDiagram(b)
 
-        return np.vstack((a[:,0], persistence)).T
+        return np.vstack((a[:, 0], persistence)).T
 
     @property
     def persistence_diagram(self):
