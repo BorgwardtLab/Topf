@@ -26,8 +26,9 @@ if __name__ == '__main__':
     plt.subplot(3, 1, 2)
     sns.lineplot(x=peaks[:, 0], y=peaks[:, 1])
 
-    # Third, let's show an example of filtering. At present, there is
-    # not automated way of doing so.
+    # Third, let's show an example of filtering. This is the manual way
+    # of filtering. It is particularly useful if you know the height of
+    # an interesting peak.
     filtered_data = data[peaks[:, 1] > 4]  # only keep high peaks
 
     plt.subplot(3, 1, 3)
