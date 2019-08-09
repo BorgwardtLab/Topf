@@ -22,9 +22,9 @@
 __author__ = 'Bastian Rieck'
 __version__ = '0.1'
 
-
 import numpy as np
 import collections.abc
+import logging
 
 
 class UnionFind:
@@ -97,8 +97,28 @@ class PersistenceTransformer:
     corresponding persistence diagram are calculated as well.
     '''
 
-    def __init__(self, calculate_persistence_diagram=False):
+    def __init__(
+        self,
+        calculate_persistence_diagram=False,
+        n_peaks=None,
+    ):
+        '''
+        Creates a new instance of the persistence transformer class. The
+        client can use various options here to change its behaviour.
+
+        :param calculate_persistence_diagram: If set, calculates the
+        persistence diagram along with transformed function. In this
+        case, use the `persistence_diagram` property of the class to
+        access it.
+
+        :param n_peaks: If set, keeps only the specified number of
+        peaks. Peaks will be eliminated in top-down order starting
+        from the one with the lowest persistence. Thus, if the var
+        is 1, only the highest peak will be kept.
+        '''
+
         self._calculate_persistence_diagram = calculate_persistence_diagram
+        self._n_peaks = n_peaks
         self._persistence_diagram = None
 
     def fit_transform(self, a):
@@ -197,6 +217,45 @@ class PersistenceTransformer:
         # tuples to store.
         if b is not None:
             self._persistence_diagram = PersistenceDiagram(b)
+
+        # Perform peak filtering: reduce the number of peaks such that
+        # only `n_peaks` remain. If this is not possible (because of a
+        # strange value distribution, try to approximate the number).
+        if self._n_peaks is not None:
+            persistence_values = sorted(persistence)[::-1]
+            n_peaks = self._n_peaks
+
+            assert num_vertices == len(persistence_values)
+
+            # Error condition: no filtering should be done because the
+            # number of peaks coincides with the number of points. The
+            # client will not be notified here, because this condition
+            # is only provided for readability.
+            if n_peaks == len(persistence_values):
+                pass
+
+            # Error condition: there are fewer values than there are
+            # peaks requested. In this case, we just warn the client
+            # and continue with our life. There is nothing to do.
+            elif n_peaks > len(persistence_values):
+                logging.warn(f'''
+Specified {n_peaks} peaks, but only {num_vertices} peaks are available. I
+shall return those.
+''')
+                n_peaks = num_vertices
+
+            # Error condition: there are duplicate values, so we cannot
+            # satisfy the request entirely. We warn the client and just
+            # return more peaks.
+            elif persistence_values[n_peaks] == persistence_values[n_peaks+1]:
+                logging.warn(f'''
+There are duplicate persistence values, so I cannot satisfy the requested
+number of {n_peaks} peaks. More will be returned.
+''')
+
+            # Perform the filtering
+            threshold = persistence_values[n_peaks - 1]
+            persistence[persistence < threshold] = 0
 
         return np.vstack((a[:, 0], persistence)).T
 
