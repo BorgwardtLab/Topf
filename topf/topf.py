@@ -31,7 +31,6 @@ __version__ = '0.1.0'
 
 import numpy as np
 import collections.abc
-import logging
 
 
 class UnionFind:
@@ -108,6 +107,7 @@ class PersistenceTransformer:
         self,
         calculate_persistence_diagram=False,
         n_peaks=None,
+        enforce_n_peaks=True,
     ):
         '''
         Creates a new instance of the persistence transformer class. The
@@ -122,11 +122,18 @@ class PersistenceTransformer:
         peaks. Peaks will be eliminated in top-down order starting
         from the one with the lowest persistence. Thus, if the var
         is 1, only the highest peak will be kept.
+
+        :param enforce_n_peaks: If set, ensures that `n_peaks` peaks
+        will be returned, even in cases where two peaks have the same
+        persistence. This behaviour is on by default because if users
+        request a certain number of peaks, they should get them. This
+        follows the principle of least surprise.
         '''
 
         self._calculate_persistence_diagram = calculate_persistence_diagram
         self._n_peaks = n_peaks
         self._persistence_diagram = None
+        self._enforce_n_peaks = enforce_n_peaks
 
     def fit_transform(self, a):
         a = np.asarray(a)
@@ -242,27 +249,25 @@ class PersistenceTransformer:
                 pass
 
             # Error condition: there are fewer values than there are
-            # peaks requested. In this case, we just warn the client
-            # and continue with our life. There is nothing to do.
+            # peaks requested. In this case, we raise an error.
             elif n_peaks > len(persistence_values):
-                logging.warn(f'''
-Specified {n_peaks} peaks, but only {num_vertices} peaks are available. I
-shall return those.
-''')
-                n_peaks = num_vertices
+                raise RuntimeError(
+                    f'Specified {n_peaks} peaks, but only {num_vertices} '
+                    f'peaks are available.'
+                )
 
-            # Error condition: there are duplicate values, so we cannot
-            # satisfy the request entirely. We warn the client and just
-            # return more peaks.
-            elif persistence_values[n_peaks] == persistence_values[n_peaks+1]:
-                logging.warn(f'''
-There are duplicate persistence values, so I cannot satisfy the requested
-number of {n_peaks} peaks. More will be returned.
-''')
+                n_peaks = num_vertices
 
             # Perform the filtering
             threshold = persistence_values[n_peaks - 1]
             persistence[persistence < threshold] = 0
+
+            # Duplicate values exist. Depending on our parameters, we
+            # either ignore this or cut off the peaks that come later
+            # in the sense of their x position.
+            if persistence_values[n_peaks] == persistence_values[n_peaks+1]:
+                if self._enforce_n_peaks:
+                    persistence = persistence[:n_peaks]
 
         return np.vstack((a[:, 0], persistence)).T
 
