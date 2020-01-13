@@ -12,6 +12,12 @@ peak with respect to all other peaks.
 - Python 3.7
 - `numpy`
 
+# Installation
+
+- Clone the repository
+- `poetry install` (for local development)
+- `pip3 install .` (for global usage)
+
 # Usage
 
 Install the library using `pip3 install topf`. You can then access the
