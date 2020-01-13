@@ -4,6 +4,19 @@ import numpy as np
 from topf import PersistenceTransformer
 
 
+class DegenerateFunction(unittest.TestCase):
+    def test(self):
+        a = [(0, 0.1), (1, 1), (2, 0.1), (3, 1), (4, 0.1)]
+
+        persistence_1 = PersistenceTransformer(n_peaks=1).fit_transform(a)
+        persistence_2 = PersistenceTransformer(
+                            n_peaks=1,
+                            enforce_n_peaks=False).fit_transform(a)
+
+        self.assertTrue(sum(persistence_1[:, 1] > 0) == 1)
+        self.assertTrue(sum(persistence_2[:, 1] > 0) == 2)
+
+
 class EmptyDiagram(unittest.TestCase):
     def test(self):
         pt = PersistenceTransformer()
