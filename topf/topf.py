@@ -256,8 +256,6 @@ class PersistenceTransformer:
                     f'peaks are available.'
                 )
 
-                n_peaks = num_vertices
-
             # Perform the filtering
             threshold = persistence_values[n_peaks - 1]
             persistence[persistence < threshold] = 0
@@ -265,9 +263,9 @@ class PersistenceTransformer:
             # Duplicate values exist. Depending on our parameters, we
             # either ignore this or cut off the peaks that come later
             # in the sense of their x position.
-            if persistence_values[n_peaks] == persistence_values[n_peaks+1]:
+            if persistence_values[n_peaks - 1] == persistence_values[n_peaks]:
                 if self._enforce_n_peaks:
-                    persistence = persistence[:n_peaks]
+                    persistence[n_peaks + 1:] = 0
 
         return np.vstack((a[:, 0], persistence)).T
 
