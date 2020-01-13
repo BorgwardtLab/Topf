@@ -56,11 +56,11 @@ plt.tight_layout()
 plt.show()
 ```
 
-This file is also available as [`example.py`](example.py) in this
+This file is also available as [`example.py`](examples/example.py) in this
 repository&nbsp;(with some minor modifications to simplify usage).
 It will result in the following output:
 
-![Example data with peak filtering](example.png)
+![Example data with peak filtering](examples/example.png)
 
 # Licence notice
 
