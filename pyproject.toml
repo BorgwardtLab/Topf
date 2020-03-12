@@ -8,6 +8,7 @@ license = "BSD-3-Clause"
 [tool.poetry.dependencies]
 python = ">=3.6"
 numpy = "^1.18.1"
+pytest = ">=5.3.5"
 
 [tool.poetry.dev-dependencies]
 matplotlib = "^3.1.2"
