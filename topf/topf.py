@@ -1,3 +1,5 @@
+"""`topf`: a package for topological peak filtering."""
+
 # Copyright (c) 2018 Bastian Rieck
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,20 +36,33 @@ import collections.abc
 
 
 class UnionFind:
-    '''
-    An implementation of a Union--Find class. The class performs path
-    compression by default and uses integers internally for storing a
-    disjoint set.
+    """An implementation of a Union--Find class.
 
-    The class requires the vertices to form a contiguous sequence, so
-    no gaps are allowed. The vertices also have to be zero-indexed.
-    '''
+    Basic implementation of a Union--Find algorithm for a set of
+    vertices with contiguous vertex indices. The class performs path
+    compression by default and uses integers internally for storing
+    a disjoint set.
 
-    def __init__(self, num_vertices):
-        self.num_vertices = num_vertices
-        self.parent = {x: x for x in range(num_vertices)}
+    The class requires the vertices to form a contiguous sequence, so no
+    gaps are allowed. The vertices also have to be zero-indexed.
+    """
+
+    def __init__(self, n_vertices):
+        """Create new instance of the class.
+
+        Creates a new Union--Find class with `n_vertices` vertices. The
+        vertices are expected to be zero-indexed.
+
+        Parameters
+        ----------
+        n_vertices : int
+            Number of vertices
+        """
+        self.n_vertices = n_vertices
+        self.parent = {x: x for x in range(n_vertices)}
 
     def find(self, u):
+        """Find and return parent of `u`."""
         if self.parent[u] == u:
             return u
         else:
@@ -56,10 +71,18 @@ class UnionFind:
             return self.parent[u]
 
     def merge(self, u, v):
-        '''
+        """Merge `u` into the component of `v`.
+
         Merges vertex u into the component of vertex v. Note the
         asymmetry of this operation.
-        '''
+
+        Parameters
+        ----------
+        u : int
+            Source vertex
+        v : int
+            Target vertex
+        """
         if u != v:
             self.parent[self.find(u)] = self.find(v)
 
