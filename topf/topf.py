@@ -88,29 +88,44 @@ class UnionFind:
 
 
 class PersistenceDiagram(collections.abc.Sequence):
-    '''
+    """Persistence diagram storage class.
+
     Simple class for storing the pairs of a persistence diagram. This is
     nothing but a light-weight wrapper for additional convenience.
-    '''
+    """
 
     def __init__(self, pairs):
+        """Create new diagram from sequence of pairs."""
         self._pairs = pairs
 
     def __len__(self):
+        """Return number of persistence pairs."""
         return len(self._pairs)
 
     def __getitem__(self, index):
+        """Return persistence at index `index`."""
         return self._pairs[index]
 
     def __str__(self):
+        """Return string representation of the persistence diagram."""
         return str(self._pairs)
 
     def total_persistence(self, p=1.0):
-        '''
+        """Calculate total persistence of the persistence diagram.
+
         Calculates the sum of all persistence values in the diagram,
         weighted by the specified power.
-        '''
 
+        Parameters
+        ----------
+        p : float
+            Exponent for the weight calculation. Must be positive, else
+            an exception will be raised.
+
+        Returns
+        -------
+        Total persistence of the persistence diagram.
+        """
         assert p > 0.0
 
         persistence_values = self._pairs[:, 0] - self._pairs[:, 1]
