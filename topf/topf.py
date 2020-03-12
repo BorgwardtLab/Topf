@@ -135,11 +135,12 @@ class PersistenceDiagram(collections.abc.Sequence):
 
 
 class PersistenceTransformer:
-    '''
+    """Persistence transformer class.
+
     Transforms a function that is represented as an input array of (x,y)
     pairs into (x, persistence(x)) pairs. Optionally, all tuples of the
     corresponding persistence diagram are calculated as well.
-    '''
+    """
 
     def __init__(
         self,
@@ -147,33 +148,48 @@ class PersistenceTransformer:
         n_peaks=None,
         enforce_n_peaks=True,
     ):
-        '''
-        Creates a new instance of the persistence transformer class. The
-        client can use various options here to change its behaviour.
+        """Create new instance of the persistence transformer class.
 
-        :param calculate_persistence_diagram: If set, calculates the
-        persistence diagram along with transformed function. In this
-        case, use the `persistence_diagram` property of the class to
-        access it.
+        Parameters
+        ----------
+        calculate_persistence_diagram : bool
+            If set, calculates the persistence diagram along with
+            transformed function. Use the `persistence_diagram`
+            property of the class to access it.
 
-        :param n_peaks: If set, keeps only the specified number of
-        peaks. Peaks will be eliminated in top-down order starting
-        from the one with the lowest persistence. Thus, if the var
-        is 1, only the highest peak will be kept.
+        n_peaks : bool
+            If set, keeps only the specified number of peaks. Peaks will
+            be eliminated in top-down order starting from the one with
+            the lowest persistence. Thus, if `n_peaks` is 1, only the
+            highest peak will be kept.
 
-        :param enforce_n_peaks: If set, ensures that `n_peaks` peaks
-        will be returned, even in cases where two peaks have the same
-        persistence. This behaviour is on by default because if users
-        request a certain number of peaks, they should get them. This
-        follows the principle of least surprise.
-        '''
-
+        enforce_n_peaks : bool
+            If set, ensures that `n_peaks` peaks will be returned, even in
+            cases where two peaks have the same persistence. This behaviour
+            is on by default because if users request a certain number of
+            peaks, they should get them. This follows the principle of least
+            surprise.
+        """
         self._calculate_persistence_diagram = calculate_persistence_diagram
         self._n_peaks = n_peaks
         self._persistence_diagram = None
         self._enforce_n_peaks = enforce_n_peaks
 
     def fit_transform(self, a):
+        """Transform a single function according to its peaks.
+
+        Parameters
+        ----------
+        a : array_like of shape (n, 2)
+            Function with `n` 2D samples to be transformed into
+            persistence space.
+
+        Returns
+        -------
+        `np.array` of shape (n, 2), following the original input order
+        of the function, but with each value having been transformed to
+        a persistence value.
+        """
         a = np.asarray(a)
 
         if len(a.shape) != 2 or a.shape[1] != 2:
@@ -195,23 +211,22 @@ class PersistenceTransformer:
 
         # Prepare Union--Find data structure; by default, every vertex
         # is initialized to be its own parent.
-        num_vertices = len(a)
-        uf = UnionFind(num_vertices)
+        n_vertices = len(a)
+        uf = UnionFind(n_vertices)
 
         # By default, all points that are not explicitly handled will be
         # assigned a persistence value of zero.
-        persistence = np.zeros(num_vertices)
+        persistence = np.zeros(n_vertices)
 
         for index in indices:
             left_index = index - 1
             right_index = index + 1
 
-            x = a[index, 0]
             y = a[index, 1]
 
             # Inner point: both neighbours are defined; this is easy to
             # handle because we just have to check both of them.
-            if left_index >= 0 and right_index <= num_vertices - 1:
+            if left_index >= 0 and right_index <= n_vertices - 1:
                 y_left = a[left_index, 1]
                 y_right = a[right_index, 1]
 
@@ -255,7 +270,7 @@ class PersistenceTransformer:
 
         # Assign the persistence value to the global maximum of the
         # function to ensure that all tuples have been paired.
-        if num_vertices > 0:
+        if n_vertices > 0:
             global_maximum_index = indices[0]
             global_minimum_index = indices[-1]
 
@@ -277,7 +292,7 @@ class PersistenceTransformer:
             persistence_values = sorted(persistence)[::-1]
             n_peaks = self._n_peaks
 
-            assert num_vertices == len(persistence_values)
+            assert n_vertices == len(persistence_values)
 
             # Error condition: no filtering should be done because the
             # number of peaks coincides with the number of points. The
@@ -290,7 +305,7 @@ class PersistenceTransformer:
             # peaks requested. In this case, we raise an error.
             elif n_peaks > len(persistence_values):
                 raise RuntimeError(
-                    f'Specified {n_peaks} peaks, but only {num_vertices} '
+                    f'Specified {n_peaks} peaks, but only {n_vertices} '
                     f'peaks are available.'
                 )
 
@@ -309,10 +324,12 @@ class PersistenceTransformer:
 
     @property
     def persistence_diagram(self):
-        '''
-        :return: Returns the persistence diagram that was optionally
-        calculated by calling :func:`fit_transform`. The diagram, if
-        available, will be returned as a 2D ``numpy.array`.
-        '''
+        """Return persistence diagram.
 
+        Returns
+        -------
+        The persistence diagram that was optionally calculated by
+        calling `fit_transform()`. The diagram, if available, will
+        be returned as a 2D `numpy.array`.
+        """
         return self._persistence_diagram
