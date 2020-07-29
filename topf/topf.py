@@ -194,9 +194,11 @@ class SlidingPersistenceTransformer:
         X = np.concatenate([X, Y_], 1)
 
         results = []
-        half_w = int(self.w/2)
-        for start in np.arange(half_w, X.shape[0] - half_w, self.s):
-            subseq = X[start - half_w:start + half_w]
+        half_w = self.w//2
+        even = (self.w % 2) == 0
+        extra_idx = 0 if even else 1
+        for start in np.arange(half_w, X.shape[0] - (half_w + extra_idx), self.s):
+            subseq = X[start - half_w:start + (half_w + extra_idx)]
             if subseq.shape[0] == self.w:
                 self.transformer.fit_transform(subseq)
                 pd = self.transformer._persistence_diagram
@@ -211,7 +213,7 @@ class SlidingPersistenceTransformer:
             results.insert(i, means)
 
         # Pad right
-        for i in range(half_w):
+        for i in range(half_w + extra_idx):
             results.append(means)
 
         results = np.asarray(results)
