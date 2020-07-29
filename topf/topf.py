@@ -137,7 +137,7 @@ class SlidingPersistenceTransformer:
     """Sliding-window persistence transformer class.
 
     Computes persistence diagrams on a sliding-window base and aggregates
-    each PD into a scalar of choice (e.g. mean, max, min, sum).
+    each PD into a scalar of total persistence with different p.
     """
 
     def __init__(
@@ -185,7 +185,7 @@ class SlidingPersistenceTransformer:
         Returns
         -------
         `np.array` of shape (m, a), where m is the number of PDs computed and
-        a the number of provided aggregation functions.
+        a the number of provided ps.
         """
 
         # Split 1d signal into two dimensions X and Y
@@ -232,7 +232,7 @@ class SlidingPersistenceTransformer:
         Returns
         -------
         `np.array` of shape (c, m, a), where m is the number of PDs computed
-        and a the number of provided aggregation functions.
+        and a the number of provided ps.
         """
         return np.apply_along_axis(self.fit_transform, 1, X)
 
