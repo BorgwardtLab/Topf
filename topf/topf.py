@@ -173,12 +173,12 @@ class SlidingPersistenceTransformer:
     def __repr__(self):
         return f'SP_{self.s}_{self.w}_{self.extend}_{"_".join(map(str, self.ps))}'
 
-    def fit_transform(self, X):
+    def fit_transform(self, Y):
         """Transform a single, one-dimensional TS.
 
         Parameters
         ----------
-        X : array_like of shape (n, 1)
+        Y : array_like of shape (n, 1)
             Function with `n` 1D samples to be transformed into
             persistence space.
 
@@ -188,37 +188,45 @@ class SlidingPersistenceTransformer:
         a the number of provided ps.
         """
 
-        # Split 1d signal into two dimensions X and Y
-        Y_ = X.reshape(-1, 1)
-        X = np.arange(Y_.shape[0]).reshape(-1, 1)
-        X = np.concatenate([X, Y_], 1)
+        # Reshape so length of TS is the first axis
+        Y = Y.reshape(-1, 1)
+        ts_len = Y.size
 
+
+        # Compute the moving windows
+        nrows = ((ts_len - self.w) // self.s) + 1
+        n = Y.strides[0]
+        strided_Y = np.lib.stride_tricks.as_strided(Y, shape=(nrows, self.w),
+                                        strides=(self.s * n, n))
+        
         results = []
-        half_w = self.w//2
-        even = (self.w % 2) == 0
-        extra_idx = 0 if even else 1
-        for start in np.arange(half_w, X.shape[0] - (half_w + extra_idx), self.s):
-            subseq = X[start - half_w:start + (half_w + extra_idx)]
-            if subseq.shape[0] == self.w:
-                self.transformer.fit_transform(subseq)
-                pd = self.transformer._persistence_diagram
-                aggregations = [pd.total_persistence(p) for p in self.ps]
-                results.append(aggregations)
+        current_idx = 0
+        for subseq in strided_Y:
+            # Compute the X coordinates
+            X = np.arange(current_idx, current_idx + self.w).reshape(-1, 1)
+            subseq = subseq.reshape(-1, 1)
+            subseq = np.concatenate([X, subseq], axis=1)
+            self.transformer.fit_transform(subseq)
+            pd = self.transformer._persistence_diagram
+            aggregations = [pd.total_persistence(p) for p in self.ps]
+            results.append(aggregations)
+            current_idx += self.w
 
         # Padding with mean values
         means = np.mean(results, 0)
 
         # Pad left
+        half_w = self.w // 2
         for i in range(half_w):
             results.insert(i, means)
 
         # Pad right
-        for i in range(half_w + extra_idx):
+        for i in range(ts_len - len(results)):
             results.append(means)
 
         results = np.asarray(results)
         if self.extend:
-            results = np.concatenate([results, Y_], 1)
+            results = np.concatenate([results, Y], 1)
 
         return results
 
