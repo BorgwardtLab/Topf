@@ -144,7 +144,7 @@ class SlidingPersistenceTransformer:
         self,
         stride=1,
         w_size=50,
-        agg=['sum', 'mean'],
+        p=[1.0, 0.5],
         extend=True
     ):
         """
@@ -156,8 +156,8 @@ class SlidingPersistenceTransformer:
         w_size : int
             Window size of sliding window
 
-        agg : Sequential
-            List of aggregation function to aggregate the PD
+        p : Sequential
+            List of ps for total persistence computation
 
         extend : boolean
             Whether to use sliding persistence features only (False) or whether
@@ -166,20 +166,12 @@ class SlidingPersistenceTransformer:
 
         self.s = stride
         self.w = w_size
-        self.agg = []
-        for n in agg:
-            if n == 'sum':
-                self.agg.append(np.sum)
-            elif n == 'mean':
-                self.agg.append(np.mean)
-            elif n == 'max':
-                self.agg.append(np.max)
-        self.agg_repr = agg
+        self.ps = p
         self.extend = extend
         self.transformer = PersistenceTransformer(True, False, False)
 
     def __repr__(self):
-        return f'SP_{self.s}_{self.w}_{self.extend}_{"_".join(self.agg_repr)}'
+        return f'SP_{self.s}_{self.w}_{self.extend}_{"_".join(map(str, self.ps))}'
 
     def fit_transform(self, X):
         """Transform a single, one-dimensional TS.
@@ -208,7 +200,7 @@ class SlidingPersistenceTransformer:
             if subseq.shape[0] == self.w:
                 self.transformer.fit_transform(subseq)
                 pd = self.transformer._persistence_diagram
-                aggregations = [f(abs(pd[:, 1] - pd[:, 0])) for f in self.agg]
+                aggregations = [pd.total_persistence(p) for p in self.ps]
                 results.append(aggregations)
 
         # Padding with mean values
