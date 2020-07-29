@@ -133,6 +133,116 @@ class PersistenceDiagram(collections.abc.Sequence):
 
         return np.power(np.sum(persistence_values), 1.0 / p)
 
+class SlidingPersistenceTransformer:
+    """Sliding-window persistence transformer class.
+
+    Computes persistence diagrams on a sliding-window base and aggregates
+    each PD into a scalar of choice (e.g. mean, max, min, sum).
+    """
+
+    def __init__(
+        self,
+        stride=1,
+        w_size=50,
+        agg=['sum', 'mean'],
+        extend=True
+    ):
+        """
+        Parameters
+        ----------
+        stride : int
+            Stride size for sliding window
+
+        w_size : int
+            Window size of sliding window
+
+        agg : Sequential
+            List of aggregation function to aggregate the PD
+
+        extend : boolean
+            Whether to use sliding persistence features only (False) or whether
+            to add sliding persistence features as additional dimension.
+        """
+
+        self.s = stride
+        self.w = w_size
+        self.agg = []
+        for n in agg:
+            if n == 'sum':
+                self.agg.append(np.sum)
+            elif n == 'mean':
+                self.agg.append(np.mean)
+            elif n == 'max':
+                self.agg.append(np.max)
+        self.agg_repr = agg
+        self.extend = extend
+        self.transformer = PersistenceTransformer(True, False, False)
+
+    def __repr__(self):
+        return f'SP_{self.s}_{self.w}_{self.extend}_{"_".join(self.agg_repr)}'
+
+    def fit_transform(self, X):
+        """Transform a single, one-dimensional TS.
+
+        Parameters
+        ----------
+        X : array_like of shape (n, 1)
+            Function with `n` 1D samples to be transformed into
+            persistence space.
+
+        Returns
+        -------
+        `np.array` of shape (m, a), where m is the number of PDs computed and
+        a the number of provided aggregation functions.
+        """
+
+        # Split 1d signal into two dimensions X and Y
+        Y_ = X.reshape(-1, 1)
+        X = np.arange(Y_.shape[0]).reshape(-1, 1)
+        X = np.concatenate([X, Y_], 1)
+
+        results = []
+        half_w = int(self.w/2)
+        for start in np.arange(half_w, X.shape[0] - half_w, self.s):
+            subseq = X[start - half_w:start + half_w]
+            if subseq.shape[0] == self.w:
+                self.transformer.fit_transform(subseq)
+                pd = self.transformer._persistence_diagram
+                aggregations = [f(abs(pd[:, 1] - pd[:, 0])) for f in self.agg]
+                results.append(aggregations)
+
+        # Padding with mean values
+        means = np.mean(results, 0)
+
+        # Pad left
+        for i in range(half_w):
+            results.insert(i, means)
+
+        # Pad right
+        for i in range(half_w):
+            results.append(means)
+
+        results = np.asarray(results)
+        if self.extend:
+            results = np.concatenate([results, Y_], 1)
+
+        return results
+
+    def transform(self, X):
+        """ Applies sliding window transform along the channel axis of a multi-
+        dimensional time series.
+
+        Parameters
+        ----------
+        X : Sequential
+            Input time series of dimension c x l (num_channels x length)
+
+        Returns
+        -------
+        `np.array` of shape (c, m, a), where m is the number of PDs computed
+        and a the number of provided aggregation functions.
+        """
+        return np.apply_along_axis(self.fit_transform, 1, X)
 
 class PersistenceTransformer:
     """Persistence transformer class.
